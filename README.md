@@ -17,7 +17,7 @@ Zellij plugin that auto-switches macOS input method via [macism](https://github.
 
 ```bash
 rustup target add wasm32-wasip1
-cargo build --release --target wasm32-wasip1
+cargo build --release --target wasm32-wasip1 --features wasm-plugin
 ```
 
 Output: `target/wasm32-wasip1/release/zellij_macism.wasm`.
