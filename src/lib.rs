@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use zellij_tile::prelude::*;
 
-mod state;
+pub mod state;
 
 #[derive(Default)]
 struct MacismPlugin {

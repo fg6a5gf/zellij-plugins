@@ -54,3 +54,35 @@ pub struct State {
     pub focused_pane: Option<PaneId>,
     pub pane_im: HashMap<PaneId, String>,
 }
+
+pub fn classify_str(mode: &str) -> ModeClass {
+    match mode {
+        "Normal" | "Locked" => ModeClass::Cjk,
+        _ => ModeClass::Abc,
+    }
+}
+
+pub fn decide(state: &mut State, new_class: ModeClass, default_cjk: &str) -> Action {
+    let pane = match state.focused_pane {
+        Some(p) => p,
+        None => return Action::Noop,
+    };
+
+    if state.prev_class == Some(new_class) {
+        return Action::Noop;
+    }
+
+    state.prev_class = Some(new_class);
+
+    match new_class {
+        ModeClass::Abc => Action::QueryThenSwitchAbc { pane },
+        ModeClass::Cjk => {
+            let target = state
+                .pane_im
+                .get(&pane)
+                .cloned()
+                .unwrap_or_else(|| default_cjk.to_string());
+            Action::Restore { pane, target }
+        }
+    }
+}
