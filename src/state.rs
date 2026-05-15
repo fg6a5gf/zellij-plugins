@@ -86,3 +86,19 @@ pub fn decide(state: &mut State, new_class: ModeClass, default_cjk: &str) -> Act
         }
     }
 }
+
+pub fn apply_query_result(
+    state: &mut State,
+    pane: PaneId,
+    exit_code: Option<i32>,
+    stdout: &str,
+) {
+    if exit_code != Some(0) {
+        return;
+    }
+    let trimmed = stdout.trim();
+    if trimmed.is_empty() {
+        return;
+    }
+    state.pane_im.insert(pane, trimmed.to_string());
+}

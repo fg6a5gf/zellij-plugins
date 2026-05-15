@@ -76,3 +76,35 @@ fn no_focused_pane_yields_noop() {
     assert_eq!(act, Action::Noop);
     assert_eq!(s.prev_class, None, "prev_class not advanced when noop");
 }
+
+use zellij_macism::state::apply_query_result;
+
+#[test]
+fn query_success_saves_trimmed_im() {
+    let mut s = State::default();
+    apply_query_result(&mut s, 4, Some(0), "im.rime.inputmethod.Squirrel.Hans\n");
+    assert_eq!(s.pane_im.get(&4).map(String::as_str),
+               Some("im.rime.inputmethod.Squirrel.Hans"));
+}
+
+#[test]
+fn query_failure_does_not_save() {
+    let mut s = State::default();
+    apply_query_result(&mut s, 4, Some(127), "");
+    assert!(s.pane_im.get(&4).is_none());
+}
+
+#[test]
+fn query_empty_stdout_does_not_save() {
+    let mut s = State::default();
+    apply_query_result(&mut s, 4, Some(0), "   \n");
+    assert!(s.pane_im.get(&4).is_none());
+}
+
+#[test]
+fn query_overwrites_previous_save() {
+    let mut s = State::default();
+    s.pane_im.insert(4, "old".into());
+    apply_query_result(&mut s, 4, Some(0), "new\n");
+    assert_eq!(s.pane_im.get(&4).map(String::as_str), Some("new"));
+}
