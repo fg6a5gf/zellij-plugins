@@ -108,3 +108,32 @@ fn query_overwrites_previous_save() {
     apply_query_result(&mut s, 4, Some(0), "new\n");
     assert_eq!(s.pane_im.get(&4).map(String::as_str), Some("new"));
 }
+
+use zellij_macism::state::decide_force_abc;
+
+#[test]
+fn force_abc_saves_pane_and_emits_query() {
+    let mut s = State::default();
+    s.focused_pane = Some(5);
+    let act = decide_force_abc(&mut s);
+    assert_eq!(act, Action::QueryThenSwitchAbc { pane: 5 });
+    assert_eq!(s.forced_abc_pane, Some(5));
+}
+
+#[test]
+fn force_abc_no_focus_is_noop() {
+    let mut s = State::default();
+    let act = decide_force_abc(&mut s);
+    assert_eq!(act, Action::Noop);
+    assert_eq!(s.forced_abc_pane, None);
+}
+
+#[test]
+fn force_abc_already_forced_is_noop() {
+    let mut s = State::default();
+    s.focused_pane = Some(5);
+    s.forced_abc_pane = Some(3);
+    let act = decide_force_abc(&mut s);
+    assert_eq!(act, Action::Noop);
+    assert_eq!(s.forced_abc_pane, Some(3), "existing forced pane preserved");
+}

@@ -103,3 +103,15 @@ pub fn apply_query_result(
     }
     state.pane_im.insert(pane, trimmed.to_string());
 }
+
+pub fn decide_force_abc(state: &mut State) -> Action {
+    if state.forced_abc_pane.is_some() {
+        return Action::Noop;
+    }
+    let pane = match state.focused_pane {
+        Some(p) => p,
+        None => return Action::Noop,
+    };
+    state.forced_abc_pane = Some(pane);
+    Action::QueryThenSwitchAbc { pane }
+}
