@@ -6,6 +6,7 @@ Zellij plugin that auto-switches macOS input method via [macism](https://github.
 
 - **Normal / Locked mode** → restores the CJK IM the pane last used (or `default_cjk` if none).
 - **Any other mode** (Pane / Tab / Resize / Move / Scroll / Session / Rename* / Tmux / Search) → switches to ABC (English).
+- **Pipe message `force_abc`** (sent via `MessagePlugin` keybind) → query + save current pane's IM → switch ABC. On `PaneClosed`, restore the saved IM.
 
 ## Requirements
 
@@ -44,6 +45,21 @@ load_plugins {
 ```
 
 All three keys are optional; defaults shown above.
+
+## Force ABC on specific keybinds
+
+For tools like yazi or harpoon launched via floating pane, chain `MessagePlugin` action before launch:
+
+```kdl
+bind "Ctrl f" {
+    MessagePlugin "file:~/.config/zellij/plugins/zellij_macism.wasm" {
+        name "force_abc"
+    }
+    Run "yazi" { floating true; close_on_exit true; }
+}
+```
+
+The plugin saves the current IM, switches to ABC, and restores on `PaneClosed`.
 
 ## Permissions
 

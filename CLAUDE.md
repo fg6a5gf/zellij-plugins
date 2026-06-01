@@ -126,6 +126,7 @@ Add to `~/.bashrc` or `~/.bash_profile`. Auto-attaches to session `main`; create
 
 - **Normal / Locked 模式** → 恢复该 pane 上次使用的 CJK 输入法（无记录则用 `default_cjk`）
 - **其他模式**（Pane/Tab/Resize/Move/Scroll/Session/Rename*/Tmux/Search）→ 强制切 ABC
+- **`Ctrl+f`/`Ctrl+y`**（yazi/harpoon）→ keybind 通过 `MessagePlugin` 发 `force_abc` 给 plugin → 切 ABC,记录 pane id;`PaneClosed` 时恢复
 
 ### 安装位置
 
