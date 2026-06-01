@@ -137,3 +137,38 @@ fn force_abc_already_forced_is_noop() {
     assert_eq!(act, Action::Noop);
     assert_eq!(s.forced_abc_pane, Some(3), "existing forced pane preserved");
 }
+
+use zellij_macism::state::decide_pane_closed;
+
+#[test]
+fn pane_closed_restores_forced_with_saved_im() {
+    let mut s = State::default();
+    s.forced_abc_pane = Some(5);
+    s.pane_im.insert(5, "im.rime.inputmethod.Squirrel.Hans".into());
+    let act = decide_pane_closed(&mut s, "default-cjk");
+    assert_eq!(act, Action::Restore {
+        pane: 5,
+        target: "im.rime.inputmethod.Squirrel.Hans".into(),
+    });
+    assert_eq!(s.forced_abc_pane, None, "forced state cleared");
+}
+
+#[test]
+fn pane_closed_falls_back_to_default_when_no_saved() {
+    let mut s = State::default();
+    s.forced_abc_pane = Some(5);
+    let act = decide_pane_closed(&mut s, "default-cjk");
+    assert_eq!(act, Action::Restore {
+        pane: 5,
+        target: "default-cjk".into(),
+    });
+    assert_eq!(s.forced_abc_pane, None);
+}
+
+#[test]
+fn pane_closed_no_forced_is_noop() {
+    let mut s = State::default();
+    let act = decide_pane_closed(&mut s, "default-cjk");
+    assert_eq!(act, Action::Noop);
+    assert_eq!(s.forced_abc_pane, None);
+}

@@ -115,3 +115,16 @@ pub fn decide_force_abc(state: &mut State) -> Action {
     state.forced_abc_pane = Some(pane);
     Action::QueryThenSwitchAbc { pane }
 }
+
+pub fn decide_pane_closed(state: &mut State, default_cjk: &str) -> Action {
+    let pane = match state.forced_abc_pane.take() {
+        Some(p) => p,
+        None => return Action::Noop,
+    };
+    let target = state
+        .pane_im
+        .get(&pane)
+        .cloned()
+        .unwrap_or_else(|| default_cjk.to_string());
+    Action::Restore { pane, target }
+}
