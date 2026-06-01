@@ -172,3 +172,15 @@ fn pane_closed_no_forced_is_noop() {
     assert_eq!(act, Action::Noop);
     assert_eq!(s.forced_abc_pane, None);
 }
+
+#[test]
+fn decide_cjk_to_abc_skips_query_when_forced() {
+    let mut s = State::default();
+    s.focused_pane = Some(5);
+    s.prev_class = Some(ModeClass::Cjk);
+    s.forced_abc_pane = Some(5);
+    let act = decide(&mut s, ModeClass::Abc, "default-cjk");
+    assert_eq!(act, Action::Noop, "must not query when already forced");
+    assert_eq!(s.prev_class, Some(ModeClass::Abc), "prev_class still updates");
+    assert_eq!(s.forced_abc_pane, Some(5), "forced state preserved");
+}

@@ -76,7 +76,12 @@ pub fn decide(state: &mut State, new_class: ModeClass, default_cjk: &str) -> Act
     state.prev_class = Some(new_class);
 
     match new_class {
-        ModeClass::Abc => Action::QueryThenSwitchAbc { pane },
+        ModeClass::Abc => {
+            if state.forced_abc_pane.is_some() {
+                return Action::Noop;
+            }
+            Action::QueryThenSwitchAbc { pane }
+        }
         ModeClass::Cjk => {
             let target = state
                 .pane_im
