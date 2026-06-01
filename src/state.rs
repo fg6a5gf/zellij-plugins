@@ -53,6 +53,7 @@ pub struct State {
     pub prev_class: Option<ModeClass>,
     pub focused_pane: Option<PaneId>,
     pub pane_im: HashMap<PaneId, String>,
+    pub forced_abc_pane: Option<PaneId>,
 }
 
 pub fn classify_str(mode: &str) -> ModeClass {
