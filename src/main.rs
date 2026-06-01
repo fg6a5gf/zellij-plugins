@@ -1,7 +1,10 @@
 use std::collections::BTreeMap;
 use zellij_tile::prelude::*;
 use zellij_macism::state;
-use state::{apply_query_result, classify_str, decide, Action, Config, State};
+use state::{
+    apply_query_result, classify_str, decide, decide_force_abc, decide_pane_closed,
+    Action, Config, State,
+};
 
 #[derive(Default)]
 struct MacismPlugin {
@@ -24,6 +27,7 @@ impl ZellijPlugin for MacismPlugin {
                 EventType::ModeUpdate,
                 EventType::PaneUpdate,
                 EventType::RunCommandResult,
+                EventType::PaneClosed,
             ]);
         }
     }
@@ -42,7 +46,19 @@ impl ZellijPlugin for MacismPlugin {
             Event::RunCommandResult(exit_code, stdout, _stderr, ctx) => {
                 self.handle_run_result(exit_code, &stdout, &ctx);
             }
+            Event::PaneClosed(_pane_id) => {
+                let action = decide_pane_closed(&mut self.state, &self.config.default_cjk);
+                self.execute(action);
+            }
             _ => {}
+        }
+        false
+    }
+
+    fn pipe(&mut self, msg: PipeMessage) -> bool {
+        if matches!(msg.source, PipeSource::Keybind) && msg.name == "force_abc" {
+            let action = decide_force_abc(&mut self.state);
+            self.execute(action);
         }
         false
     }
